@@ -1,0 +1,15 @@
+#!/usr/bin/bash
+set -euo pipefail
+
+STATE=/var/lib/nexus/firstboot.done
+[ -e "$STATE" ] && exit 0
+
+mkdir -p /var/lib/nexus /var/lib/flatpak
+
+mkdir -p /etc/sddm.conf.d
+cat > /etc/sddm.conf.d/10-nexus.conf <<'CONF'
+[General]
+DisplayServer=wayland
+CONF
+
+touch "$STATE"

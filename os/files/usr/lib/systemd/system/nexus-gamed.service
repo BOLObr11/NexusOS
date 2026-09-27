@@ -1,0 +1,25 @@
+[Unit]
+Description=NexusOS Game Mode service
+After=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/usr/libexec/nexus/nexus-gamed
+Restart=on-failure
+RestartSec=2
+UMask=0007
+RuntimeDirectory=nexus
+RuntimeDirectoryMode=0750
+PrivateTmp=yes
+ProtectHome=yes
+ProtectSystem=strict
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+RestrictNamespaces=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+CapabilityBoundingSet=CAP_SYS_NICE CAP_DAC_READ_SEARCH
+AmbientCapabilities=CAP_SYS_NICE
+
+[Install]
+WantedBy=multi-user.target

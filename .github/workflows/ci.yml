@@ -1,0 +1,26 @@
+name: NexusOS CI
+on:
+  push:
+  pull_request:
+
+jobs:
+  native-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install build tools
+        run: sudo apt-get update && sudo apt-get install -y cmake g++
+      - name: Test Nexus components
+        run: |
+          chmod +x scripts/*.sh tests/*.sh
+          ./scripts/test-local.sh
+
+  containerfile-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Basic source checks
+        run: |
+          test -f os/Containerfile
+          test -f installer/config.toml
+          grep -q 'fedora-bootc:44' os/Containerfile

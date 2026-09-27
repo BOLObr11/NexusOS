@@ -1,0 +1,13 @@
+[[customizations.user]]
+name = "nexus"
+password = "nexus"
+groups = ["wheel", "nexus-game"]
+
+[customizations.installer.kickstart]
+contents = """
+graphical
+zerombr
+clearpart --all --initlabel --disklabel=gpt
+autopart --type=btrfs
+reboot
+"""

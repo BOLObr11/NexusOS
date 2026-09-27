@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2560" height="1440" viewBox="0 0 2560 1440">
+  <defs>
+    <radialGradient id="g" cx="70%" cy="35%" r="80%">
+      <stop offset="0" stop-color="#172c4f"/>
+      <stop offset="0.42" stop-color="#0b1426"/>
+      <stop offset="1" stop-color="#05070d"/>
+    </radialGradient>
+    <linearGradient id="line" x1="0" x2="1">
+      <stop offset="0" stop-color="#42e8ff" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#42e8ff" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#9a5cff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="2560" height="1440" fill="url(#g)"/>
+  <circle cx="1810" cy="500" r="270" fill="none" stroke="#42e8ff" stroke-opacity="0.16" stroke-width="2"/>
+  <circle cx="1810" cy="500" r="390" fill="none" stroke="#9a5cff" stroke-opacity="0.08" stroke-width="2"/>
+  <path d="M1040 0 L1610 1440" stroke="url(#line)" stroke-width="3" opacity="0.5"/>
+  <path d="M700 0 L1270 1440" stroke="url(#line)" stroke-width="1" opacity="0.25"/>
+  <text x="150" y="1180" font-family="sans-serif" font-size="96" font-weight="700" fill="#f2f7ff">NEXUS</text>
+  <text x="155" y="1250" font-family="sans-serif" font-size="28" letter-spacing="8" fill="#42e8ff">GENESIS // DEVELOPER PREVIEW</text>
+</svg>

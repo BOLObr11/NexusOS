@@ -1,0 +1,34 @@
+FROM quay.io/fedora/fedora-bootc:44
+
+LABEL containers.bootc=1
+LABEL org.opencontainers.image.title="NexusOS Developer Preview"
+LABEL org.opencontainers.image.version="0.1"
+LABEL org.opencontainers.image.description="Immutable gaming-first desktop OS Developer Preview"
+
+RUN dnf -y install \
+    plasma-desktop plasma-workspace kwin-wayland sddm \
+    dolphin konsole systemsettings \
+    NetworkManager NetworkManager-wifi iwd \
+    bluez bluez-tools \
+    pipewire pipewire-alsa pipewire-pulseaudio wireplumber \
+    mesa-dri-drivers mesa-vulkan-drivers vulkan-loader \
+    flatpak firefox \
+    power-profiles-daemon \
+    pciutils usbutils dmidecode \
+    qemu-guest-agent virtualbox-guest-additions \
+    && dnf clean all
+
+COPY files/ /
+
+RUN groupadd -r nexus-game || true \
+    && chmod 0755 /usr/libexec/nexus/nexus-firstboot \
+    && systemctl enable NetworkManager.service \
+    && systemctl enable bluetooth.service \
+    && systemctl enable sddm.service \
+    && systemctl enable nexus-gamed.service \
+    && systemctl enable nexus-firstboot.service \
+    && systemctl set-default graphical.target \
+    && (systemctl enable qemu-guest-agent.service || true)
+
+RUN mkdir -p /sysroot
+RUN bootc container lint

@@ -1,0 +1,7 @@
+build/
+output/
+release/
+os/files/usr/libexec/nexus/nexus-gamed
+os/files/usr/bin/nexusctl
+*.iso
+*.qcow2
