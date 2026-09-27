@@ -83,8 +83,14 @@ int make_socket() {
     addr.sun_family = AF_UNIX;
     std::strncpy(addr.sun_path, kSocket, sizeof(addr.sun_path) - 1);
     if (bind(fd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) < 0) { close(fd); return -1; }
-    if (const group* g = getgrnam("nexus-game")) (void)chown(kSocket, 0, g->gr_gid);
-    chmod(kSocket, 0660);
+    if (const group* g = getgrnam("nexus-game")) {
+        if (chown(kSocket, 0, g->gr_gid) != 0) {
+            std::cerr << "nexus-gamed: warning: could not set socket group: " << std::strerror(errno) << "\n";
+        }
+    }
+    if (chmod(kSocket, 0660) != 0) {
+        std::cerr << "nexus-gamed: warning: could not set socket permissions: " << std::strerror(errno) << "\n";
+    }
     if (listen(fd, 16) < 0) { close(fd); return -1; }
     return fd;
 }
@@ -105,7 +111,10 @@ int main() {
         const ssize_t n = read(client, buf.data(), 512);
         std::string reply = "ERR EMPTY\n";
         if (n > 0) reply = handle(nexus::parse_command(std::string(buf.data(), static_cast<std::size_t>(n))));
-        (void)write(client, reply.data(), reply.size());
+        const ssize_t written = write(client, reply.data(), reply.size());
+        if (written < 0) {
+            std::cerr << "nexus-gamed: warning: socket write failed: " << std::strerror(errno) << "\n";
+        }
         close(client);
     }
     if (g_session) restore_process_priority(g_session->pid);
