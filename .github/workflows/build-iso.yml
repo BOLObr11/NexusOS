@@ -50,7 +50,10 @@ jobs:
           ISO="release/NexusOS-Gaming-2026.09-x86_64.iso"
           test -s "$ISO"
           ls -lh release/
-          sha256sum -c "$ISO.sha256"
+          NAME="$(basename "$ISO")"
+          HASH="$(awk '{print $1}' "$ISO.sha256")"
+          printf '%s  %s\n' "$HASH" "$NAME" > "$ISO.sha256"
+          (cd release && sha256sum -c "$NAME.sha256")
           file "$ISO"
 
       - name: Upload ISO artifact
