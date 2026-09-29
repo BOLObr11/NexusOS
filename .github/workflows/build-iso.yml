@@ -2,72 +2,12 @@ name: Build NexusOS ISO
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    tags:
-      - 'dp-*'
 
 permissions:
   contents: read
 
 jobs:
-  build-iso:
+  paused:
     runs-on: ubuntu-24.04
-    timeout-minutes: 180
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Install build dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y cmake g++ podman
-
-      - name: Build and test Nexus components
-        run: |
-          chmod +x scripts/*.sh tests/*.sh
-          ./scripts/test-local.sh
-          ./scripts/stage-daemon.sh
-
-      - name: Build NexusOS bootc container
-        run: |
-          sudo podman build --pull=always \
-            -t localhost/nexusos:dp-0.1 \
-            -f os/Containerfile os
-          sudo podman image inspect localhost/nexusos:dp-0.1 >/dev/null
-
-      - name: Build installer ISO
-        run: |
-          mkdir -p output release
-          sudo podman run --rm --privileged --pull=newer \
-            --security-opt label=type:unconfined_t \
-            -v "$PWD/output:/output" \
-            -v /var/lib/containers/storage:/var/lib/containers/storage \
-            -v "$PWD/installer/config.toml:/config.toml:ro" \
-            quay.io/centos-bootc/bootc-image-builder:latest \
-            --type iso \
-            --rootfs btrfs \
-            --use-librepo=true \
-            localhost/nexusos:dp-0.1
-
-      - name: Collect ISO
-        run: |
-          ISO="$(find output -type f -name '*.iso' | head -n1)"
-          if [ -z "$ISO" ]; then
-            echo 'No ISO produced by bootc image builder.' >&2
-            find output -maxdepth 5 -type f -print || true
-            exit 1
-          fi
-          cp "$ISO" release/NexusOS-Genesis-DP0.1-x86_64.iso
-          sha256sum release/NexusOS-Genesis-DP0.1-x86_64.iso > release/NexusOS-Genesis-DP0.1-x86_64.iso.sha256
-          ls -lh release/
-
-      - name: Upload ISO artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: NexusOS-Genesis-DP0.1-x86_64
-          path: release/
-          if-no-files-found: error
-          retention-days: 14
+      - run: echo "Automatic ISO build temporarily paused while ArchISO profile is updated."
