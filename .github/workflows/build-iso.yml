@@ -1,13 +1,65 @@
-name: Build NexusOS ISO
+name: Build NexusOS Gaming ISO
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'scripts/build-archiso-gaming.sh'
+      - '.github/workflows/build-iso.yml'
+      - 'os/**'
+      - 'installer/**'
 
 permissions:
   contents: read
 
 jobs:
-  paused:
+  build-iso:
     runs-on: ubuntu-24.04
+    timeout-minutes: 180
+
     steps:
-      - run: echo "Automatic ISO build temporarily paused while ArchISO profile is updated."
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Free runner disk space
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /usr/local/.ghcup || true
+          sudo docker image prune -af || true
+          df -h
+
+      - name: Prepare output
+        run: |
+          mkdir -p release
+          sudo mkdir -p /mnt/nexusos-build
+          sudo chmod 777 /mnt/nexusos-build
+          chmod +x scripts/build-archiso-gaming.sh
+
+      - name: Build Arch Linux based NexusOS ISO
+        run: |
+          docker pull archlinux:latest
+          docker run --rm --privileged \
+            -v "$PWD:/repo" \
+            -v /mnt/nexusos-build:/work \
+            archlinux:latest \
+            bash -lc '/repo/scripts/build-archiso-gaming.sh /work/nexusos /repo/release'
+
+      - name: Verify ISO
+        run: |
+          ISO="release/NexusOS-Gaming-2026.09-x86_64.iso"
+          test -s "$ISO"
+          ls -lh release/
+          sha256sum -c "$ISO.sha256"
+          file "$ISO"
+
+      - name: Upload ISO artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: NexusOS-Gaming-2026.09-x86_64
+          path: |
+            release/NexusOS-Gaming-2026.09-x86_64.iso
+            release/NexusOS-Gaming-2026.09-x86_64.iso.sha256
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 14
